@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.bis.busStopMapper">
+
+    <!-- selectBusStopHistory -->
+    <select id="selectBusStopHistory" 
+    		parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel" 
+    		resultType="com.gideon.bims_oxy.app.bis.model.BusStopInfo">
+   	<![CDATA[
+	SELECT B.BUSST_ID AS busStopId,
+		   C.ML_NM AS busStopName,
+		   CASE WHEN D.BUSST_ID IS NULL THEN 'N'
+			    ELSE 'Y'
+		   END AS favoriteYn
+	FROM   BIS_APP_LTLY_SEARCH A
+	JOIN   BUS_STOP_INFO B ON (A.RFRC_ID = B.BUSST_ID)
+	JOIN   MULTI_LANG_INFO C ON (B.BUSST_NM_ML_ID = C.ML_ID)
+	LEFT OUTER JOIN  BIS_APP_FAVOR  D ON (A.RFRC_ID = D.BUSST_ID AND A.QR_USR_ID = D.QR_USR_ID AND D.FAVOR_TYPE = '2')
+	WHERE  A.QR_USR_ID = #{qrUserId}
+	AND    A.SRCH_TYPE = '2'
+	AND    C.LANG_CD = #{languageCode}
+   	]]>
+    </select>
+    
+    <!-- insertBusStopHistory -->
+    <insert id="insertBusStopHistory" parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel">
+   	<![CDATA[
+	INSERT INTO BIS_APP_LTLY_SEARCH
+	(
+		QR_USR_ID,
+		SRCH_TYPE,
+		RFRC_ID,
+		REG_DT
+	) VALUES (
+		#{qrUserId},
+		'2',
+		#{busStopId},
+		SYSDATE
+	)
+   	]]>
+    </insert>
+            
+    <!-- deleteBusStopHistory -->
+    <delete id="deleteBusStopHistory" parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel">
+   	<![CDATA[
+	DELETE FROM BIS_APP_LTLY_SEARCH
+	WHERE QR_USR_ID  = #{qrUserId}
+	AND   SRCH_TYPE = '2'
+   	]]>
+	<if test="busStopId != null and !busStopId.equals('')">AND RFRC_ID = #{busStopId}</if>
+    </delete>
+    
+    <!-- searchBusStop -->
+    <select id="searchBusStop" 
+    		parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel" 
+    		resultType="com.gideon.bims_oxy.app.bis.model.BusStopInfo">
+   	<![CDATA[
+	SELECT A.BUSST_ID AS busStopId,
+		   B.ML_NM AS busStopName,
+		   CASE WHEN C.BUSST_ID IS NULL THEN 'N'
+			    ELSE 'Y'
+		   END AS favoriteYn
+	FROM   BUS_STOP_INFO A
+	JOIN   MULTI_LANG_INFO B ON (A.BUSST_NM_ML_ID = B.ML_ID)
+	LEFT OUTER JOIN  BIS_APP_FAVOR C ON (
+		A.BUSST_ID = C.BUSST_ID 
+		AND C.QR_USR_ID  = #{qrUserId}
+		AND C.FAVOR_TYPE = '2'
+	)
+	WHERE A.USE_YN = 'Y' 
+	AND   B.LANG_CD = #{languageCode}
+	]]>
+	<if test="busStopName != null and !busStopName.equals('')">AND B.ML_NM LIKE '%' || #{busStopName} || '%'</if>
+    </select>  
+    
+    <!-- selectArrivingBusListByBusStop -->
+    <select id="selectArrivingBusListByBusStop" 
+    		parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel" 
+    		resultType="com.gideon.bims_oxy.app.bis.model.BusArriveInfo">
+   	<![CDATA[
+	WITH TEMP_TAB AS (
+		SELECT A.ROT_ID, A.BUSST_ID, A.BUS_ID, MAX(A.INFO_CRT_DT) AS INFO_CRT_DT
+		FROM   BUS_STOP_ARRV_PRDT A
+		JOIN   OPRN_INFO_HIST B ON (A.ROT_ID = B.ROT_ID AND A.BUS_ID = B.BUS_ID)
+		WHERE  A.BUSST_ID = #{busStopId}
+		AND    A.INFO_CRT_DT >= TO_DATE(TO_CHAR(SYSDATE, 'YYYYMMDD') || '000000', 'YYYYMMDDHH24MISS')
+		AND    B.OPRN_STRT_DT >= TO_DATE(TO_CHAR(SYSDATE, 'YYYYMMDD') || '000000', 'YYYYMMDDHH24MISS')
+		AND    B.OPRN_END_DT IS NULL
+		GROUP BY A.ROT_ID, A.BUSST_ID, A.BUS_ID
+	)
+	SELECT E.ML_NM AS busStopName,
+	       A.ROT_ID AS routeId,
+	       C.ROT_NO AS routeNumber,
+	       B.LOC_NO AS locationNum,
+		   B.PRDT_PASS_TIME_MIN || ':' || B.PRDT_PASS_TIME_SEC AS passTime
+	FROM   TEMP_TAB A
+	JOIN   BUS_STOP_ARRV_PRDT B ON (A.ROT_ID = B.ROT_ID AND A.BUSST_ID = B.BUSST_ID AND A.BUS_ID = B.BUS_ID AND A.INFO_CRT_DT = B.INFO_CRT_DT)
+	JOIN   BUS_ROT_INFO C ON (A.ROT_ID = C.ROT_ID)
+	JOIN   BUS_STOP_INFO D ON (A.BUSST_ID = D.BUSST_ID)
+	JOIN   MULTI_LANG_INFO E ON (D.BUSST_NM_ML_ID = E.ML_ID)
+	WHERE  E.LANG_CD = #{languageCode}
+   	]]>
+    </select>   
+    
+    <!-- selectBusStopPosition -->
+    <select id="selectBusStopPosition" 
+    		parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel" 
+    		resultType="com.gideon.bims_oxy.app.bis.model.BusStopInfo">
+   	<![CDATA[
+	SELECT A.BUSST_ID AS busStopId,
+		   B.ML_NM AS busStopName,
+		   A.ATL_LATITUDE AS lat,
+		   A.ATL_LONGITUDE AS lon
+	FROM   BUS_STOP_INFO A
+	JOIN   MULTI_LANG_INFO B ON (A.BUSST_NM_ML_ID = B.ML_ID)
+	WHERE  A.BUSST_ID = #{busStopId}
+	AND    B.LANG_CD = #{languageCode}	
+   	]]>
+    </select>
+    
+    <!-- selectWithinBusStop -->
+    <select id="selectWithinBusStop" 
+            parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel" 
+            resultType="com.gideon.bims_oxy.app.bis.model.BusStopInfo">
+    <![CDATA[
+	SELECT A.BUSST_ID AS busStopId,
+	           B.ML_NM AS busStopName,
+	           A.ATL_LATITUDE AS lat,
+	           A.ATL_LONGITUDE AS lon
+	FROM   BUS_STOP_INFO A
+	JOIN   MULTI_LANG_INFO B ON (A.BUSST_NM_ML_ID = B.ML_ID)
+	WHERE  SQRT( (A.ATL_LONGITUDE - #{lon})*(A.ATL_LONGITUDE-#{lon}) + (A.ATL_LATITUDE - #{lat})*(A.ATL_LATITUDE - #{lat}) ) < 0.005
+	AND    B.LANG_CD = #{languageCode} 
+    ]]>
+    </select>    
+
+</mapper>

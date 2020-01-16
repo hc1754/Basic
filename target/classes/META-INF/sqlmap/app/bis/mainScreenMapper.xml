@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.bis.mainScreenMapper">
+
+    <!-- select route list -->
+    <select id="selectFavoriteList" 
+    		parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel" 
+    		resultType="com.gideon.bims_oxy.app.bis.model.FavoriteInfo">
+   	<![CDATA[
+	WITH TEMP_ROUTE AS
+	(
+		SELECT A.ROT_ID,
+		       A.ROT_NO,
+		       B.ML_NM AS ROT_NAME
+		FROM   BUS_ROT_INFO A
+		JOIN   MULTI_LANG_INFO B ON (A.ROT_NM_ML_ID = B.ML_ID)
+		WHERE  B.LANG_CD = #{languageCode}
+	), TEMP_BUSST AS (
+		SELECT A.BUSST_ID,
+		       B.ML_NM AS BUSST_NAME
+		FROM   BUS_STOP_INFO A
+		JOIN   MULTI_LANG_INFO B ON (A.BUSST_NM_ML_ID = B.ML_ID)
+		WHERE  B.LANG_CD = #{languageCode}
+	)	
+	SELECT A.FAVOR_TYPE AS favoriteType,
+	       A.SEQ AS registSequence,
+	       B.ROT_ID AS routeId,
+	       B.ROT_NO AS routeNumber,
+	       B.ROT_NAME AS routeName,
+	       C.BUSST_ID AS busStopId,
+	       C.BUSST_NAME AS busStopName,
+	       TO_CHAR(A.REG_DT, 'DD-MM-YYYY') AS registDate
+	FROM   BIS_APP_FAVOR A
+	LEFT JOIN TEMP_ROUTE B ON (A.ROT_ID = B.ROT_ID)
+	LEFT JOIN TEMP_BUSST C ON (A.BUSST_ID = C.BUSST_ID)
+	WHERE  A.QR_USR_ID = #{qrUserId}
+	ORDER BY A.FAVOR_TYPE DESC, A.REG_DT DESC
+	]]>
+	</select>
+    
+    <!-- select route list -->
+    <select id="selectFavoriteRouteList" 
+    		parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel" 
+    		resultType="com.gideon.bims_oxy.app.bis.model.RouteInfo">
+   	<![CDATA[
+	SELECT A.ROT_ID AS routeId,
+		   B.ROT_NO AS routeNumber,
+		   C.ML_NM AS routeName,
+		   A.FAVOR_TYPE AS favoriteType
+	FROM   BIS_APP_FAVOR A
+	JOIN   BUS_ROT_INFO B ON (A.ROT_ID = B.ROT_ID)
+	JOIN   MULTI_LANG_INFO C ON (B.ROT_NM_ML_ID = C.ML_ID)
+	WHERE  A.QR_USR_ID = #{qrUserId} 
+	AND    A.FAVOR_TYPE = '1'
+	AND    C.LANG_CD = #{languageCode}
+	ORDER BY A.SEQ
+   	]]>
+    </select>
+    
+    <!-- select busStop list -->
+    <select id="selectFavoriteBusStopList" 
+    		parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel" 
+    		resultType="com.gideon.bims_oxy.app.bis.model.BusStopInfo">
+   	<![CDATA[
+	SELECT A.BUSST_ID AS busStopId,
+	       C.ML_NM AS busStopName,
+	       A.FAVOR_TYPE AS favoriteType
+	FROM   BIS_APP_FAVOR A
+	JOIN   BUS_STOP_INFO B ON (A.BUSST_ID = B.BUSST_ID)
+	JOIN   MULTI_LANG_INFO C ON (B.BUSST_NM_ML_ID = C.ML_ID)
+	WHERE  A.QR_USR_ID = #{qrUserId} 
+	AND    A.FAVOR_TYPE = '2'
+	AND    C.LANG_CD = #{languageCode}
+	ORDER BY A.SEQ
+   	]]>
+    </select>  
+    
+    <!-- select favorite multi list -->
+    <select id="selectFavoriteMultiList" 
+    		parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel" 
+    		resultType="com.gideon.bims_oxy.app.bis.model.BusStopInfo">
+   	<![CDATA[
+	SELECT A.ROT_ID,
+		   B.ROT_NO,
+		   C.ML_NM,
+		   A.FAVOR_TYPE AS favoriteType
+	FROM   BIS_APP_FAVOR A
+	JOIN   BUS_ROT_INFO B ON (A.ROT_ID = B.ROT_ID)
+	JOIN   MULTI_LANG_INFO C ON (B.ROT_NM_ML_ID = C.ML_ID)
+	WHERE  A.QR_USR_ID = #{qrUserId} 
+	AND    A.BUSST_ID = #{busStopId}
+	AND    A.FAVOR_TYPE = '3'
+	AND    C.LANG_CD = #{languageCode}
+	ORDER BY A.SEQ
+   	]]>
+    </select>      
+            
+    <!-- insert BreakWayInfo -->
+    <insert id="insertFavorite" parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel">
+   	<![CDATA[
+	INSERT INTO BIS_APP_FAVOR
+	(
+		QR_USR_ID,
+		ROT_ID,
+		BUSST_ID,
+		SEQ,
+		FAVOR_TYPE,
+		REG_DT
+	)
+	SELECT #{qrUserId} QR_USR_ID,
+	       #{routeId} AS ROT_ID,
+	       #{busStopId} AS BUSST_ID,
+	       CASE WHEN MAX(SEQ) IS NULL THEN 1
+	            ELSE MAX(SEQ) + 1
+	       END AS SEQ,
+	       #{favoriteType} AS FAVOR_TYPE,
+	       SYSDATE AS REG_DT
+	FROM   BIS_APP_FAVOR 
+	WHERE  QR_USR_ID = #{qrUserId} 
+    AND    FAVOR_TYPE = #{favoriteType}
+   	]]>
+    </insert>
+    
+    <!-- delete BreakWayInfo -->
+    <delete id="deleteFavorite" parameterType="com.gideon.bims_oxy.app.bis.model.inbound.BusParamModel">
+   	<![CDATA[
+	DELETE BIS_APP_FAVOR
+	WHERE  QR_USR_ID = #{qrUserId}
+	AND    FAVOR_TYPE = #{favoriteType}
+	]]>
+	<if test="routeId != null and !routeId.equals('')">AND ROT_ID = #{routeId}</if>
+	<if test="busStopId != null and !busStopId.equals('')">AND BUSST_ID = #{busStopId}</if>
+    </delete>
+
+</mapper>

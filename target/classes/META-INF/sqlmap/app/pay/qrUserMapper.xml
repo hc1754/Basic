@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="app.pay.qrUserMapper">
+
+    <resultMap id="selectBusPayList" type="java.util.HashMap">
+        <result column="rotid" property="rotid" />
+        <result column="amt" property="amt" />
+        <result column="qrcodecreatedate" property="qrcodecreatedate" />
+    </resultMap>
+    <resultMap id="selectChrgList" type="java.util.HashMap">
+        <result column="chargedate" property="chargedate" />
+        <result column="cardno" property="cardno" />
+        <result column="chargeamt" property="chargeamt" />
+    </resultMap>
+    <resultMap id="selectGetGiftList" type="java.util.HashMap">
+        <result column="sendusername" property="sendusername" />
+        <result column="regdate" property="regdate" />
+        <result column="chargeamt" property="chargeamt" />
+        <result column="senduserid" property="senduserid" />
+    </resultMap>
+    <resultMap id="selectPostGiftList" type="java.util.HashMap">
+        <result column="recvusername" property="recvusername" />
+        <result column="regdate" property="regdate" />
+        <result column="chargeamt" property="chargeamt" />
+        <result column="recvuserid" property="recvuserid" />
+    </resultMap>
+    <select id="selectQrUserCardInfo" resultType="java.util.HashMap">
+        <![CDATA[
+        select * from QR_MBL_CARD_INFO where 1=1
+        ]]>
+        <if test="msgcont != null"> AND QR_USR_ID like #{userid}</if>
+    </select>
+    <select id="getUserList" resultType="java.util.HashMap">
+        <![CDATA[
+        select * from (SELECT
+          A.*,
+          to_char(A.BRTH_DAY,'YYYY-MM-DD') as birth,
+          NVL((select to_char(ZZ.CHRG_DT,'YYYY-MM-DD HH24:MI:SS') from QR_MBL_CARD_INFO ZZ where ZZ.QR_USR_ID=A.QR_USR_ID ),null) as lastchargedate,
+          NVL((select Z.BAL from QR_MBL_CARD_INFO Z where Z.QR_USR_ID=A.QR_USR_ID),'0') as balance
+
+        FROM QR_USER_INFO A where 1=1
+
+        ]]>
+        <if test="userid != null"> <![CDATA[AND A.QR_USR_ID= #{userid} ]]></if>
+
+        <![CDATA[
+        ORDER BY REG_DT DESC) WHERE rownum <=20
+         ]]>
+    </select>
+    <select id="getIdList" resultType="java.util.HashMap">
+        <![CDATA[
+        SELECT
+        QR_USR_ID as userid
+        FROM QR_USER_INFO A where 1=1
+--         AND rownum <=20
+        ]]>
+        <if test="email != null"> <![CDATA[AND QR_USR_EMAIL= #{email} ]]></if>
+        <if test="phone != null"> <![CDATA[AND TMP_PHONE= #{phone} ]]></if>
+
+        <![CDATA[
+        ORDER BY REG_DT DESC
+         ]]>
+    </select>
+    <select id="loginCheck" resultType="String" parameterType="java.util.HashMap">
+        <![CDATA[
+        SELECT QR_USR_ID
+        FROM QR_USER_INFO where QR_USR_ID=#{userid} and QR_USR_PW=#{password}
+        ]]>
+    </select>
+    <select id="loginDeviceIdCheck" resultType="String" parameterType="java.util.HashMap">
+        <![CDATA[
+        SELECT nvl(TMP_QR_DEVICE_ID,2)
+        FROM QR_USER_INFO where QR_USR_ID=#{userid}
+        ]]>
+    </select>
+    <select id="findId" parameterType="java.util.HashMap" resultType="com.gideon.bims_oxy.app.pay.vo.QrUserVO">
+        <![CDATA[
+        SELECT QR_USR_ID as userid,QR_USR_EMAIL as email,TMP_PHONE as phone
+        FROM QR_USER_INFO where 1=1
+        ]]>
+        <if test="userid != null"> AND QR_USR_ID= #{userid}</if>
+
+    </select>
+    <select id="joinIdCheck" resultType="Integer" parameterType="String">
+        <![CDATA[
+        SELECT count(*)
+        FROM QR_USER_INFO where QR_USR_ID=#{userid}
+        ]]>
+    </select>
+    <select id="joinEmailCheck" resultType="Integer" parameterType="String">
+        <![CDATA[
+        SELECT count(*)
+        FROM QR_USER_INFO where QR_USR_EMAIL=#{email}
+        ]]>
+    </select>
+    <insert id="insertUser" parameterType="String">
+        <![CDATA[
+        insert into QR_USER_INFO(QR_USR_ID,QR_USR_PW,QR_USR_EMAIL,BRTH_DAY,GNDR,FMLY_NM,NM,REG_DT,USE_YN,TMP_PHONE,TMP_QR_DEVICE_ID)
+      VALUES (
+        #{userid},
+        #{password},
+        #{email},
+        TO_DATE(#{birth},'YY-MM-DD'),
+        #{gender},
+        #{firstname},
+        #{lastname},
+        SYSDATE,
+        'Y',
+        #{phone},
+        #{deviceid}
+        )
+        ]]>
+    </insert>
+    <update id="updateUser" parameterType="String">
+        <![CDATA[
+        update QR_USER_INFO set USE_YN = #{useyn} where QR_USR_ID =#{userid}
+        ]]>
+    </update>
+    <update id="updateUserInfo" parameterType="java.util.HashMap">
+        <if test="newpassword !='' ">
+        <![CDATA[
+           update QR_USER_INFO
+           set
+           FMLY_NM = #{firstname},
+           nm = #{lastname},
+           BRTH_DAY=TO_DATE(#{birth},'yyyy-mm-dd'),
+           GNDR=#{gender},
+           QR_USR_PW=#{newpassword},
+           PREV_PW=#{password},
+           TMP_PHONE=#{phone},
+           QR_USR_EMAIL=#{email}
+            where QR_USR_ID =#{userid} and QR_USR_PW =#{password}
+        ]]>
+        </if>
+        <if test="newpassword==''">
+        <![CDATA[
+            update QR_USER_INFO set FMLY_NM = #{firstname},nm = #{lastname},BRTH_DAY=TO_DATE(#{birth},'yyyy-mm-dd'),GNDR=#{gender},TMP_PHONE=#{phone},QR_USR_EMAIL=#{email} where QR_USR_ID =#{userid} and QR_USR_PW =#{password}
+        ]]>
+        </if>
+    </update>
+    <update id="updatePassword" parameterType="java.util.HashMap">
+        <![CDATA[
+        update QR_USER_INFO set PREV_PW= QR_USR_PW, QR_USR_PW = #{password} where QR_USR_ID =#{userid}
+
+        ]]>
+        <if test="email != null"> and QR_USR_EMAIL= #{email}</if>
+    </update>
+    <update id="updateDevice" parameterType="java.util.HashMap">
+        <![CDATA[
+        update QR_USER_INFO set TMP_QR_DEVICE_ID = #{deviceid} where QR_USR_ID =#{userid}
+        ]]>
+    </update>
+    <select id="selectBusPayList" parameterType="java.util.HashMap" resultType="java.util.HashMap" resultMap="selectBusPayList">
+        <![CDATA[
+        select
+          ROT_ID as rotid,
+          nvl(AMT,0) as amt,
+          to_char(QR_CRT_DT,'YYYY-MM-DD HH24:MI:SS') as qrcodecreatedate
+          from QR_BUS_PAYMENT_HIST where QR_USR_ID=#{userid}
+        ]]>
+        <if test="startregdate != null">and QR_CRT_DT > to_date(#{startregdate},'YY-MM-DD HH24:MI:SS')</if>
+
+    </select>
+    <select id="selectChrgList" parameterType="java.util.HashMap" resultType="java.util.HashMap" resultMap="selectChrgList">
+        select CARD_NO as cardno,
+        to_char(CHRG_DT,'YYYY-MM-DD HH24:MI:SS')as chargedate,
+        CHRG_AMT as chargeamt
+        from QR_CHRG_HIST where  QR_USR_ID=#{userid}
+        <if test="startregdate != null">and CHRG_DT > to_date(#{startregdate},'YY-MM-DD HH24:MI:SS')</if>
+    </select>
+    <select id="selectGetGiftList" parameterType="java.util.HashMap" resultType="java.util.Map" resultMap="selectGetGiftList">
+        select QR_USR_ID as senduserid,
+        (select FMLY_NM||nm from qr_user_info where qr_user_info.QR_USR_ID = QR_GIFT_HIST.QR_USR_ID)as sendusername,
+        to_char(CHRG_DT,'YYYY-MM-DD HH24:MI:SS') as regdate,
+        GIFT_AMT as chargeamt
+        from QR_GIFT_HIST where  TGT_QR_USR_ID=#{userid}
+        <if test="startregdate != null">and CHRG_DT > to_date(#{startregdate},'YY-MM-DD HH24:MI:SS')</if>
+    </select>
+    <select id="selectPostGiftList" parameterType="java.util.HashMap" resultType="java.util.Map" resultMap="selectPostGiftList">
+        select TGT_QR_USR_ID as recvuserid,
+        (select FMLY_NM||nm from qr_user_info where qr_user_info.QR_USR_ID =  QR_GIFT_HIST.TGT_QR_USR_ID)as recvusername,
+        to_char(CHRG_DT,'YYYY-MM-DD HH24:MI:SS') as regdate,
+        GIFT_AMT as chargeamt
+        from QR_GIFT_HIST where  QR_USR_ID=#{userid}
+        <if test="startregdate != null">and CHRG_DT > to_date(#{startregdate},'YY-MM-DD HH24:MI:SS')</if>
+    </select>
+
+</mapper>

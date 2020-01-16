@@ -1,0 +1,141 @@
+@charset "UTF-8";
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700);
+@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+/* reset */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,form,fieldset,p,button,img,iframe,legend,input,textarea,button,select{margin:0; padding:0}
+body,h1,h2,h3,h4,h5,th,input,textarea,button{font-family: 'Roboto', 'Noto Sans KR', sans-serif; color:#222; font-weight: normal; font-size: 16px}
+body{*word-break:break-all;-ms-word-break:break-all}
+li{list-style:none}
+img,fieldset,form{border:0 none}
+input,select,button{vertical-align:middle}
+button{cursor:pointer;}
+a{color:#5f5f68;text-decoration:none;}
+a:hover{outline:none}
+a:focus{outline:none}
+input:focus{outline:none}
+a img{border:0 none}
+hr{display:none}
+table{border-collapse:collapse;border-spacing:0}
+form {border:0 none; background:none; margin:0; padding:0}
+legend {display:none}
+img, video{max-width:100%; height:auto}
+video{min-width:100%}
+div,img,table {vertical-align: middle}
+
+/* form */
+input, select, textarea, button {-webkit-appearance:none}
+input::placeholder, textarea::placeholder {color: #b5b5b5;}
+input {line-height: 42px; border-radius: 0}
+button:focus {outline: none;}
+.checklabel {display: inline-block; position: relative; padding-left: 10%; width: 70%; line-height: 48px;
+    -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
+.checklabel input {position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;}
+.checklabel .checkmark {position: absolute; top: 11px; left: 0; height: 24px; width: 24px; border-radius: 100%; border: 1px solid #d9d9d9}
+
+.checklabel:active {background: none}
+
+.checklabel input.selected ~ .checkmark {border: 1px solid #63b9e2; background-color: #63b9e2;}
+.checklabel input.selected ~ .checkmark:after {display: block;}
+
+.checklabel .checkmark:after {content: ""; position: absolute; display: none;}
+.checklabel input.selected ~ .checkmark:after {left: 9px; top: 5px; width: 4px; height: 9px; border: solid white; border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg); transform: rotate(45deg);}
+
+/* color */
+.gradient {background-image: linear-gradient(141deg, #88dce8 3%, #5ab2e1 69%);}
+.blue {background: #6cc2e4}
+.grey {background: #808080}
+
+/* float */
+.fL {float: left;}
+.fR {float: right;}
+.dpinline {display: inline-block;}
+
+/* font-size */
+.f12 {font-size: 12px}
+.f13 {font-size: 13px}
+.f14 {font-size: 14px}
+.f15 {font-size: 15px}
+.f16 {font-size: 16px}
+.f17 {font-size: 17px}
+.f18 {font-size: 18px}
+.f19 {font-size: 19px}
+.f20 {font-size: 20px}
+.f21 {font-size: 21px}
+.f22 {font-size: 22px}
+.f23 {font-size: 23px}
+.f24 {font-size: 24px}
+.f25 {font-size: 25px}
+.f26 {font-size: 26px}
+.f27 {font-size: 27px}
+.f28 {font-size: 28px}
+.f29 {font-size: 29px}
+.f30 {font-size: 30px}
+
+/* align */
+.tal {text-align: left;}
+.tac {text-align: center;}
+.tar {text-align: right;}
+
+/* width % */
+.wp10 {width: 10%}
+.wp20 {width: 20%}
+.wp25 {width: 25%}
+.wp33 {width: 33.33%}
+.wp40 {width: 40%}
+.wp50 {width: 50%}
+.wp60 {width: 60%}
+.wp80 {width: 80%}
+.wp90 {width: 90%}
+.wp96 {width: 96%}
+.wp100 {width: 100%}
+
+/* width px */
+.wx50 {width: 50px}
+
+/* height */
+.hx100 {height: 100px}
+.hx200 {height: 200px}
+.hx300 {height: 300px}
+.hx400 {height: 400px}
+.hx500 {height: 500px}
+.hx600 {height: 600px}
+
+/* min-width px */
+.mwx100 {min-width: 100px}
+
+/* margin */
+.mr5 {margin-right: 5px}
+.mr10 {margin-right: 10px}
+.mr20 {margin-right: 20px}
+.mr30 {margin-right: 30px}
+.mr40 {margin-right: 40px}
+.mr50 {margin-right: 50px}
+.ml5 {margin-left: 5px}
+.ml10 {margin-left: 10px}
+.ml20 {margin-left: 20px}
+.ml30 {margin-left: 30px}
+.ml40 {margin-left: 40px}
+.ml50 {margin-left: 50px}
+.mt5 {margin-top: 5px}
+.mt10 {margin-top: 10px}
+.mt20 {margin-top: 20px}
+.mt30 {margin-top: 30px}
+.mt40 {margin-top: 40px}
+.mt50 {margin-top: 50px}
+.mb5 {margin-bottom: 5px}
+.mb10 {margin-bottom: 10px}
+.mb20 {margin-bottom: 20px}
+.mb30 {margin-bottom: 30px}
+.mb40 {margin-bottom: 40px}
+.mb50 {margin-bottom: 50px}
+
+
+
+
+
+
+
+
+.test {}

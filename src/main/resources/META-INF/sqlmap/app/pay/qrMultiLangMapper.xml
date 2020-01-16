@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="app.pay.qrMultiLangMapper">
+
+    <insert id="insertLangItem" parameterType="java.util.HashMap">
+    <![CDATA[
+      INSERT INTO DISPLAY_MULTI_LANG_INFO (LANG_CD, SCRN_ITEM_DISTC, SCRN_ITEM_ID, DISP_CONT, REG_ID, REG_DT) VALUES
+      (#{langCd}, #{itemDistc}, #{itemId}, #{itemName}, 'OxyPay', SYSDATE)
+    ]]>
+    </insert>
+
+    <update id="updateLangItem" parameterType="java.util.HashMap">
+
+      update DISPLAY_MULTI_LANG_INFO set LANG_CD=#{langCd},SCRN_ITEM_DISTC=#{itemDistc},DISP_CONT=#{itemName} where SCRN_ITEM_ID=#{itemId} and LANG_CD= #{langCd}
+
+    </update>
+    <select id="multiLangList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        <![CDATA[
+        select * from (select * from DISPLAY_MULTI_LANG_INFO order by REG_DT desc) where 1=1
+         ]]>
+        <if test="langCd != null"> and LANG_CD= #{langCd}</if>
+        <if test="itemId != null"> and scrn_item_id= #{itemId}</if>
+        <![CDATA[
+        and rownum <=20
+         ]]>
+    </select>
+
+</mapper>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="app.pay.qrChrgMapper">
+    <select id="getDeviceId" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT * from QR_CHRG_ORDER_HIST WHERE ORD_NO = #{ordernumber}
+    </select>
+    <select id="getGiftDeviceId" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT * from QR_GIFT_ORDER_HIST WHERE ORD_NO = #{ordernumber}
+    </select>
+    <insert id="insertQrChrgOrder" parameterType="java.util.HashMap">
+    <![CDATA[
+        insert into QR_CHRG_ORDER_HIST(REG_DT, QR_USR_ID, AREA_CD, ORD_NO, CHRG_TYPE, CHRG_DIV,CHRG_AMT,CHRG_FEE,PAYMT_DT,CHRG_DT,TMP_DEVICE_ID,LANGUAGE)
+            VALUES
+        (
+        SYSDATE,#{qrUsrId},
+        #{areaCd},
+        (select to_char(sysdate,'yyyymmdd')||'-'||SUBSTR(MAX(REGEXP_REPLACE(ord_no,'-'))+1, 9, 9)  from QR_CHRG_ORDER_HIST),
+        #{chrgType},
+        #{chrgDiv},
+        #{chrgAmt},
+        #{chrgFee},
+        SYSDATE,
+        to_date(#{chrgDt},'YY-MM-DD HH24:MI:SS'),
+        #{fcmtoken},
+        #{Language}
+        )
+    ]]>
+    </insert>
+    <insert id="insertQrGiftOrder" parameterType="java.util.HashMap">
+        <![CDATA[
+        insert into QR_GIFT_ORDER_HIST(TGT_QR_USR_ID,TGT_MBL_DEVC_ID,MBL_DEVC_ID,TGT_AREA_CD,REG_DT, QR_USR_ID, ORD_NO, GIFT_TYPE,GIFT_AMT,GIFT_FEE,PAYMT_DT,CHRG_DT,LANGUAGE)
+            VALUES
+        (
+        #{tgtQrUsrId},
+        #{tgtMblDevcId},
+        #{mblDevcId},
+        #{areaCd},
+        SYSDATE,
+        #{qrUsrId},
+        (select to_char(sysdate,'yyyymmdd')||'-'||SUBSTR(MAX(REGEXP_REPLACE(ord_no,'-'))+10001, 9, 9)  from QR_GIFT_ORDER_HIST),
+        #{chrgType},
+        #{chrgAmt},
+        #{chrgFee},
+        SYSDATE,
+        to_date(#{chrgDt},'YY-MM-DD HH24:MI:SS'),
+        #{Language}
+        )
+    ]]>
+    </insert>
+
+    <insert id="insertQrChrgNewOk" parameterType="java.util.HashMap">
+        <![CDATA[
+        insert into QR_CHRG_HIST (REG_DT, QR_USR_ID, AREA_CD, ORD_NO, CHRG_TYPE, CHRG_DIV,CHRG_AMT,CHRG_FEE,PAYMT_DT,CHRG_DT)
+            SELECT SYSDATE, QR_USR_ID, AREA_CD, ORD_NO, CHRG_TYPE, CHRG_DIV,CHRG_AMT,CHRG_FEE,PAYMT_DT,CHRG_DT +(round((to_date(to_char(sysdate,'YYYY-MM-DD HH24:MI:SS'),'YY-MM-DD HH24:MI:SS')-REG_DT) * 24 * 60 * 60))/(24*60*60) FROM BIMS.QR_CHRG_ORDER_HIST WHERE ORD_NO=#{ordernumber}
+
+    ]]>
+    </insert>
+    <insert id="insertQrGiftNewOk" parameterType="java.util.HashMap">
+
+        insert into QR_GIFT_HIST(TGT_QR_USR_ID,TGT_MBL_DEVC_ID,TGT_AREA_CD,REG_DT, QR_USR_ID, ORD_NO,GIFT_TYPE,GIFT_AMT,GIFT_FEE,PAYMT_DTM,CHRG_DT)
+                          SELECT TGT_QR_USR_ID,TGT_MBL_DEVC_ID,TGT_AREA_CD,SYSDATE, QR_USR_ID, ORD_NO, GIFT_TYPE, GIFT_AMT,GIFT_FEE,PAYMT_DT,CHRG_DT +(round((to_date(to_char(sysdate,'YYYY-MM-DD HH24:MI:SS'),'YY-MM-DD HH24:MI:SS')-REG_DT) * 24 * 60 * 60))/(24*60*60) FROM QR_GIFT_ORDER_HIST WHERE ORD_NO=#{ordernumber}
+
+    </insert>
+    <select id="selectChargeOrderNumber" parameterType="java.util.HashMap" resultType="String">
+
+        <if test="chargetype == 'CHRG'">
+        <![CDATA[
+         select to_char(sysdate,'yyyymmdd')||'-'||SUBSTR(MAX(REGEXP_REPLACE(ord_no,'-'))+1, 9, 9) as orderNumber FROM QR_CHRG_ORDER_HIST
+       ]]>
+        </if>
+        <if test="chargetype == 'GIFT'">
+        <![CDATA[
+         select to_char(sysdate,'yyyymmdd')||'-'||SUBSTR(MAX(REGEXP_REPLACE(ord_no,'-'))+10001, 9, 9) as orderNumber FROM QR_GIFT_ORDER_HIST
+       ]]>
+        </if>
+    </select>
+
+    <update id="updateNewQrCardBal" parameterType="java.util.HashMap">
+        <![CDATA[
+
+        UPDATE QR_MBL_CARD_INFO
+            SET CHRG_DT = SYSDATE ,
+              BAL  = (BAL+TO_NUMBER((select CHRG_AMT from QR_CHRG_ORDER_HIST where ORD_NO=#{ordernumber}))),
+              BL_YN=(SELECT  CASE   WHEN ( bal - TO_NUMBER((select CHRG_AMT from QR_CHRG_ORDER_HIST where ORD_NO=#{ordernumber}))) < 0 THEN 'Y' else 'N' End as BL_YN from QR_MBL_CARD_INFO where QR_USR_ID=(select QR_USR_ID from QR_CHRG_ORDER_HIST where ORD_NO=#{ordernumber}))
+            where QR_USR_ID =(select QR_USR_ID from QR_CHRG_ORDER_HIST where ORD_NO=#{ordernumber})
+
+        ]]>
+    </update>
+    <insert id="insertNewQrCardBal" parameterType="java.util.HashMap">
+        <![CDATA[
+        INSERT into qr_mbl_card_info (
+        QR_USR_ID
+        , AREA_CD
+        , REG_DT
+        , CHRG_DT
+        , BL_YN
+        , BAL
+    )
+    VALUES (
+        (select QR_USR_ID from QR_CHRG_ORDER_HIST where ORD_NO=#{ordernumber})
+        , '01'
+        , SYSDATE
+        , SYSDATE
+        , 'N'
+        ,(select CHRG_AMT from QR_CHRG_ORDER_HIST where ORD_NO=#{ordernumber})
+    )
+        ]]>
+    </insert>
+
+    <update id="updateNewGiftQrCardBal" parameterType="java.util.HashMap">
+        <![CDATA[
+
+        UPDATE QR_MBL_CARD_INFO
+            SET CHRG_DT = SYSDATE ,
+              BAL  = (BAL+TO_NUMBER((select GIFT_AMT from QR_GIFT_ORDER_HIST where ORD_NO=#{ordernumber}))),
+              BL_YN=(SELECT  CASE   WHEN ( bal - TO_NUMBER((select GIFT_AMT from QR_GIFT_ORDER_HIST where ORD_NO=#{ordernumber}))) < 0 THEN 'Y' else 'N' End as BL_YN from QR_MBL_CARD_INFO where QR_USR_ID=(select TGT_QR_USR_ID from QR_GIFT_ORDER_HIST where ORD_NO=#{ordernumber}))
+            where QR_USR_ID =(select TGT_QR_USR_ID from QR_GIFT_ORDER_HIST where ORD_NO=#{ordernumber})
+
+        ]]>
+    </update>
+    <insert id="insertNewGiftQrCardBal" parameterType="java.util.HashMap">
+        <![CDATA[
+        INSERT into qr_mbl_card_info (
+        QR_USR_ID
+        , AREA_CD
+        , REG_DT
+        , CHRG_DT
+        , BL_YN
+        , BAL
+    )
+    VALUES (
+        (select TGT_QR_USR_ID from QR_GIFT_ORDER_HIST where ORD_NO=#{ordernumber})
+        , '01'
+        , SYSDATE
+        , SYSDATE
+        , 'N'
+        ,(select GIFT_AMT from QR_GIFT_ORDER_HIST where ORD_NO=#{ordernumber})
+    )
+        ]]>
+    </insert>
+
+
+
+
+    <insert id="insertQrChrgOk" parameterType="java.util.HashMap">
+        <![CDATA[
+        insert into QR_CHRG_HIST(REG_DT, QR_USR_ID, AREA_CD, ORD_NO, CHRG_TYPE, CHRG_DIV,CHRG_AMT,CHRG_FEE,PAYMT_DT,CHRG_DT)
+            VALUES
+        (
+        SYSDATE,
+        #{qrUsrId},
+        #{areaCd},
+        (select to_char(sysdate,'yyyymmdd')||'-'||SUBSTR(MAX(REGEXP_REPLACE(ord_no,'-'))+1, 9, 9)  from QR_CHRG_HIST),
+        #{chrgType},
+        #{chrgDiv},
+        #{chrgAmt},
+        #{chrgFee},
+        SYSDATE,
+        to_date(#{chrgDt},'YY-MM-DD HH24:MI:SS')
+        )
+    ]]>
+    </insert>
+    <insert id="insertQrGiftOk" parameterType="java.util.HashMap">
+        <![CDATA[
+        insert into QR_GIFT_HIST(TGT_QR_USR_ID,TGT_FCM_TOKEN,TGT_AREA_CD,REG_DT, QR_USR_ID, ORD_NO,GIFT_TYPE,GIFT_AMT,GIFT_FEE,PAYMT_DTM,CHRG_DT)
+            VALUES
+        (
+        #{tgtQrUsrId},
+        #{tgtMblDevcId},
+        #{areaCd},
+        SYSDATE,
+        #{qrUsrId},
+        (select to_char(sysdate,'yyyymmdd')||'-'||SUBSTR(MAX(REGEXP_REPLACE(ord_no,'-'))+1, 9, 9)  from QR_GIFT_HIST),
+        #{chrgType},
+        #{chrgAmt},
+        #{chrgFee},
+        SYSDATE,
+        to_date(#{chrgDt},'YY-MM-DD HH24:MI:SS')
+        )
+    ]]>
+    </insert>
+    <update id="updateQrCardBal" parameterType="java.util.HashMap">
+        <![CDATA[
+
+    UPDATE QR_MBL_CARD_INFO SET CHRG_DT = SYSDATE , BAL  = (BAL+TO_NUMBER(#{chrgAmt})),BL_YN=(SELECT  CASE   WHEN ( bal - TO_NUMBER(#{chrgAmt})) < 0 THEN 'Y' else 'N' End as BL_YN from QR_MBL_CARD_INFO where QR_USR_ID=#{amtQrUsrId}) where qr_usr_id =#{amtQrUsrId}
+
+    ]]>
+    </update>
+    <insert id="insertQrCardBal" parameterType="java.util.HashMap">
+        <![CDATA[
+        INSERT into qr_mbl_card_info ( QR_USR_ID
+        , AREA_CD
+        , REG_DT
+        , CHRG_DT
+        , BL_YN
+        , BAL
+    )
+    VALUES (
+        #{amtQrUsrId}
+        , #{areaCd}
+        , SYSDATE
+        , SYSDATE
+        , 'N'
+        ,#{chrgAmt}
+    )
+        ]]>
+    </insert>
+
+
+
+</mapper>

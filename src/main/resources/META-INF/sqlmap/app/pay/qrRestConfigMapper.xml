@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.pay.qrRestConfigMapper">
+
+    <select id="selectChrgPlcyInfo" resultType="com.gideon.bims_oxy.app.pay.vo.ChrgPlcyVO">
+        <![CDATA[
+        select CHRG_AMT as chrgAmt,FEE as fee from CHRG_PLCY_INFO order by CHRG_AMT ASC
+        ]]>
+    </select>
+    <select id="selectMsgMultiLangInfo" resultType="com.gideon.bims_oxy.app.pay.vo.MsgMultilangVO">
+        <![CDATA[
+
+        select SCRN_ITEM_ID as msgId, DISP_CONT as msgCont, REG_ID as regId,to_char(REG_DT,'YYYY-MM-DD HH:MM:SS') as regDt,to_char(MOD_DT,'YYYY-MM-DD HH:MM:SS') as modDt from DISPLAY_MULTI_LANG_INFO where LANG_CD=#{langcd}
+
+        ]]>
+        <if test="msgcont != null"> AND MSG_CONT like #{msgcont}</if>
+        <![CDATA[
+         order by REG_DT desc
+         ]]>
+    </select>
+    <select id="selectQrRestConfig" resultType="Integer">
+        <![CDATA[
+        select fare from FIX_FARE_PLCY_INFO where ROWNUM <=1
+         ]]>
+    </select>
+
+    <select id="qrCrtCountLimit" resultType="Integer">
+        <![CDATA[
+        select QR_CRT_COUNT_LIMIT from QR_COMMON_INFO
+         ]]>
+    </select>
+    <select id="trcnPrmtInfo" resultType="Integer">
+        <![CDATA[
+        select QR_RTY_TAGG_WAIT_TIME from TRCN_PRMT_INFO
+         ]]>
+    </select>
+
+
+</mapper>

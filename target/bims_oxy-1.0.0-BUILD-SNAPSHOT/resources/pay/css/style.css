@@ -1,0 +1,107 @@
+.container-bg{
+    background: #222;
+}
+@media (min-width: 1200px){
+    .container {
+        max-width: 1200px;
+    }
+}
+
+#wrapper{
+    background: #000;
+}
+.col1{
+    width: 80px;
+}
+.col2{
+    width: 80px;
+}
+.col3{
+    width: 140px;
+}
+.col4{
+
+}
+.col5{
+
+}
+.col6{
+
+}
+.col7{
+
+}
+
+table.table thead th {
+    text-align: center;
+    vertical-align: middle;
+    /*border: 1px solid #2e2e2e*/
+}
+table.table tbody td {
+    text-align: center;
+    vertical-align: middle;
+    /*border: 1px solid #2e2e2e*/
+}
+table.table thead{
+
+}
+
+.toto_checkbox_img{
+    width: 22px;
+    height:22px;
+}
+.cart{
+    width: 100%;
+}
+.cart_wrap {
+    width: 100%;
+}
+#menu {
+    position: absolute;
+    top: 10px;
+    left:0;
+    width: 100%;
+}
+.btn-rounded {
+    -webkit-border-radius: 10em;
+    border-radius: 10em;
+}
+.logo-img{
+    float: left;
+    line-height: 90px;
+}
+.logo-img a img{
+    width: 80px;
+}
+
+.table-borderless td.winTD{
+    border: dashed 1px #eee;
+    width: 50px;
+}
+.table-borderless td.winTD:hover{
+    background: #ff7c3b;
+    color:#000;
+}
+.table-borderless td.winActive{
+    background: #ff081c;
+    color:#fff;
+    font-weight: bold;
+    /*border: dashed 1px #ff081c;*/
+}
+.text-gold{
+    color:#FFD700;
+}
+
+.pagination .page-item .page-link {
+    -webkit-transition: all .3s linear;
+    -o-transition: all .3s linear;
+    transition: all .3s linear;
+    outline: 0;
+    border: 0;
+    background-color: transparent;
+    font-size: .9rem;
+    color: #FFD700;
+}
+.pagination.pg-blue .page-item.active .page-link, .pagination.pg-blue .page-item.active .page-link:hover {
+    background-color: #ff3547;
+}

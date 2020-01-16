@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//END" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="idCheckMapper">
+
+	<select id="selectTrcnId" parameterType="java.util.HashMap" resultType="java.lang.String">
+		SELECT 
+			termn_id
+		FROM termn_info
+		WHERE termn_id = #{termnId}
+		AND devc_uuid = #{devcUuid}
+	</select>
+</mapper>

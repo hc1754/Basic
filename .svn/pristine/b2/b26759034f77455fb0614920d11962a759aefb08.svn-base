@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="app.pay.qrBusPayMapper">
+    <select id="selectQrBusPayHistory" resultType="com.gideon.bims_oxy.app.pay.vo.QrBusPayVO">
+        <![CDATA[
+        select
+            PAYMT_DT as paymtDt,
+            QR_USR_ID  as  userId,
+            AREA_CD as  areaCd,
+            TRD_TYPE_CD as  trdTypeCd,
+            TRANS_PROV_ID as  transProvId,
+            BRNCH_ID as  brnchId,
+            BUS_ID as  busId,
+            TERMN_ID as  termnId,
+            ROT_ID as  rotId,
+            DRV_ID as  drvId,
+            BUSST_ID as  busstId,
+            OPRN_DT as  oprnDt,
+            GETONOFF_DISTC as  getonoffDistc,
+            AMT as  amt,
+            BAL as  bal,
+            QR_CRT_DT as  qrCrtDt,
+            LONGITUDE as  longitude,
+            LATITUDE as  latitude,
+            DEDLN_YN as  dedln_yn,
+            REG_DT as  reg_dt
+         from QR_BUS_PAYMENT_HIST
+         where 1=1
+        ]]>
+        <if test="userid != null"> and QR_USR_ID= #{userid}</if>
+    </select>
+    <select id="selectBlListOld" resultType="java.util.Map">
+        <![CDATA[
+        select
+            to_char(REG_DT,'YYYY-MM-DD HH24:MI:SS')	as regDt,
+            to_char(MOD_DT,'YYYY-MM-DD HH24:MI:SS')	as modDt,
+            QR_USR_ID	as qrUsrId,
+            AREA_CD	as areaCd,
+            BAL	as bl,
+            to_char(CHRG_DT,'YYYY-MM-DD HH24:MI:SS') as chrgDt,
+            BL_YN	as blYn
+         from QR_MBL_CARD_INFO
+         where BL_YN='Y'
+        ]]>
+
+    </select>
+    <select id="selectBlList" resultType="java.util.Map">
+        <![CDATA[
+        select
+            QR_USR_ID	as qrUsrId,
+            BAL	as bl,
+            to_char(MOD_DT,'YYYY-MM-DD HH24:MI:SS') as modDt,
+            BL_YN	as blYn
+         from QR_MBL_CARD_INFO
+         where BL_YN='Y'
+        ]]>
+
+    </select>
+    <update id="updateQrCardBal" parameterType="java.util.Map">
+        <foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close="; END;">
+        <![CDATA[
+          update QR_MBL_CARD_INFO set bal=(bal-TO_NUMBER(#{item.amt})),MOD_DT = SYSDATE ,BL_YN=(SELECT  CASE   WHEN ( bal - TO_NUMBER(#{item.amt})) < 0 THEN 'Y' else 'N' End as BL_YN from QR_MBL_CARD_INFO where QR_USR_ID=#{item.userId})  where QR_USR_ID=#{item.userId}
+        ]]>
+        </foreach>
+
+    </update>
+    <insert id="insertQrBusPay" parameterType="java.util.Map">
+        <foreach collection="list" item="item"   open="INSERT ALL "  separator=" " close="SELECT * FROM DUAL">
+
+        INTO QR_BUS_PAYMENT_HIST(
+        PAYMT_DT,
+        QR_USR_ID,
+        AREA_CD,
+        TRD_TYPE_CD,
+        TRANS_PROV_ID,
+        BRNCH_ID,
+        BUS_ID,
+        TERMN_ID,
+        ROT_ID,
+        DRV_ID,
+        BUSST_ID,
+        OPRN_DT,
+        GETONOFF_DISTC,
+        AMT,
+        BAL,
+        QR_CRT_DT,
+        DEDLN_YN,
+        REG_DT,
+        PASG_CLS1_USR_CNT
+        )
+        values
+       (
+            to_date(#{item.paymtDt},'YYYY-MM-DD HH24:MI:SS'),
+            #{item.userId},
+            #{item.areaCd},
+            #{item.trdTypeCd},
+            #{item.transProvId},
+            #{item.brnchId},
+            #{item.busId},
+            #{item.termnId},
+            #{item.rotId},
+            #{item.drvId},
+            #{item.busstId},
+            to_date(#{item.oprnDt},'YYYY-MM-DD HH24:MI:SS'),
+            #{item.getonoffDistc},
+            #{item.amt},
+            (select (bal-TO_NUMBER(#{item.amt})) from qr_mbl_card_info where qr_usr_id=#{item.userId}),
+            to_date(#{item.qrCrtDt},'YYYY-MM-DD HH24:MI:SS'),
+            #{item.dedlnYn},
+            to_date(#{item.regDt},'YYYY-MM-DD HH24:MI:SS'),
+            #{item.usrCnt}
+            )
+        </foreach>
+
+    </insert>
+
+</mapper>

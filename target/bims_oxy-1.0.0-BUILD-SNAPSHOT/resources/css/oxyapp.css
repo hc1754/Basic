@@ -1,0 +1,164 @@
+@charset "UTF-8";
+
+/* layout */
+html, body {height: 100%}
+#header, #gnb {width: 100%; position: fixed; background: #FFF;}
+#header {height: 62.7px; line-height: 62.7px; top: 0; z-index: 99}
+#header h1 {width: 105px; margin: 0 0 0 54px; float:left;}
+#header h1 a {display: block;}
+#header .user {background: url(/resources/images/ic_human.svg) no-repeat 0 50%; background-size: 11px 14px; padding: 0 17px; float: right; display: inline-block;}
+#gnb {height: 72.7px; line-height: 72.7px; bottom: 0; border-top: 1px solid #cecece; text-align: center;}
+#gnb ul {width: 94%; margin: 0 auto}
+#gnb li {width: 25%; float: left;}
+#gnb li {background-repeat: no-repeat; background-position: 50% 17.5%}
+#gnb .payment {background-image: url(/resources/images/gnb_payment.svg); background-size: 21px 18.7px}
+#gnb .charge {background-image: url(/resources/images/gnb_charge.svg); background-size: 19.3px 23.3px}
+#gnb .useinfo {background-image: url(/resources/images/gnb_useinfo.svg); background-size: 20.7px 21px}
+#gnb .businfo {background-image: url(/resources/images/gnb_businfo.svg); background-size: 24px 23px}
+#gnb a {width: 100%; height: 100%; display: block; color: #181818; overflow: hidden; line-height: 105px; font-weight: 500; font-size: 13.5px}
+#gnb .payment.active {background-image: url(/resources/images/gnb_payment_on.svg)}
+#gnb .charge.active {background-image: url(/resources/images/gnb_charge_on.svg)}
+#gnb .useinfo.active {background-image: url(/resources/images/gnb_useinfo_on.svg)}
+#gnb .businfo.active {background-image: url(/resources/images/gnb_businfo_on.svg)}
+#snb {height: 100%; width: 100%; position: fixed; z-index: 100; top: 0; left: -100%; overflow-x: hidden; transition: 0.2s;}
+#snb a {display: block;}
+#snb .menu {height: 100%; width: 280px; background: #FFF; position: relative; box-shadow: 60px 60px 60px 60px rgba(0,0,0,.15)}
+#snb .menu {line-height: 50px}
+#snb .user {color: #FFF; height: 88px}
+#snb .user .name {padding: 35px 0 0 0; text-indent: 50px}
+#snb .user .name::before {content: ""; display: block; background: #FFF url(/resources/images/ic_human.svg) no-repeat 50% 50%; border-radius: 100%; width: 26px; height: 26px; position: absolute; top: 45px; left: 5%; background-size: 11px 14px}
+.closesnb, .opensnb {position: absolute; top: 0; display: block; width: 54px; height: 62.7px; background-repeat: no-repeat; background-position: 50% 50%; font-size: 0; text-indent: -9999px}
+.closesnb {right: 0; background-image: url(/resources/images/ic_closesnb.svg); background-size: 17px}
+.opensnb {left: 0; background-image: url(/resources/images/ic_opensnb.svg); background-size: 20px;}
+.container {}
+.aside .back {position: absolute; top: 0; left: 0; display: block; width: 54px; height: 62.7px; font-size: 0; text-indent: -9999px;  background: url(/resources/images/ic_back.svg) 50% 50% no-repeat; background-size: 11.5px 19px}
+.subtitle {line-height: 62.7px; font-size: 18px; text-indent: 50px;}
+
+/* bus main */
+.bisp_container {position: fixed; width: 100%; z-index: 99}
+.bispanel {height: 220px; position: relative; color: #FFF}
+.bispanel>div, .bispanel>p, .bispanel>a, .bispanel>button, .bispanel>input {position: absolute; display: block;}
+.bispanel .station {top: 20px; right: 5%; background: url(/resources/images/ic_location.svg) no-repeat 0 50%; background-size: 10.7px 14px; padding: 0 0 0 20px; line-height: 18px; font-size: 18px}
+.bispanel .bus {top: 50px; left: 32px; font-size: 44px}
+.bispanel .bus::after {content: ""; width: 30px; height: 34px; display:inline-block; background: url(/resources/images/ic_bus.svg) no-repeat 0 15px; background-size: 15.7px 19px}
+.bispanel .info {top: 50px; right: 5%; line-height: 25px; font-size: 18px}
+.bispanel .info span {padding: 0 0 0 15px}
+.bispanel .star, .bispanel .bus_add {top: 112px; border: 1px solid #FFF; border-radius: 18px; height: 36px; line-height: 36px}
+.bispanel .star {right: 5%;}
+.bispanel .bus_add {left: 32px; background: transparent url(/resources/images/ic_add.svg) no-repeat 10px; background-size: 20px; padding: 0 22px 0 42px; color: #FFF; font-size: 15px}
+.bispanel .input.search {width: 90%; left: 5%; bottom: 15px; border: none}
+.bus_list_head.main {position: fixed; top: 220px; width: 100%; z-index: 1}
+.bus_list.main {padding: 270px 0 0 0}
+.bus_list.main .bus {text-indent: 40px; background: url(/resources/images/ic_fv_bus.svg) no-repeat 10px 50%; background-size: 15px}
+.bus_list.main .station {text-indent: 40px; background: url(/resources/images/ic_fv_station.svg) no-repeat 11px 50%; background-size: 13px}
+.bus_list.main .checklabel .bus, .bus_list.main .checklabel .station {padding-left: 40px;}
+.banner {position: fixed; bottom: 72.7px; text-align: center; width: 100%; height: 70px; background: #f5f6f5;}
+.banner img {height: 70px}
+#bssl {height: 100%; width: 100%; position: fixed; z-index: 100; top: 100%; right: 0; transition: 0.2s}
+#bssl .container {height: 66%; width: 100%; background: #FFF; position: absolute; bottom: 0; padding: 62.7px 0 0 0}
+#bssl .close {position: absolute; top: 0; right: 1%; display: block; width: 70px; height: 62.7px; font-size: 0; text-indent: -9999px;  background: url(/resources/images/ic_down.svg) 50% 50% no-repeat; background-size: 18px 10.5px; z-index: 100}
+#bssl .subtitle {width: 100%; text-indent: 20px; position: absolute; top: 0; border-bottom: 1px solid #d9d9d9}
+#bssl .bus_list {height: 100%;}
+
+/* aside layer */
+#bsrc, #bloc, #stbi, #brout, #mapv {height: 100%; width: 100%; position: fixed; z-index: 100; top: 0; right: -100%; background: #FFF; transition: 0.2s;}
+
+/* bus list */
+.star {width: 36px; height: 40px; display: block; text-indent: -9999px}
+.star.white {background: transparent url(/resources/images/ic_star_white.svg) no-repeat 50% 50%; background-size: 18px}
+.star.yellow {background: transparent url(/resources/images/ic_star_yellow.svg) no-repeat 50% 50%; background-size: 18px}
+.star.blank {background: transparent url(/resources/images/ic_star_blank.svg) no-repeat 50% 50%; background-size: 16px}
+.bus_list_head {background: #f2f4f9; line-height: 46px; border-bottom: 1px solid #d9d9d9}
+.bus_list_head .title {padding: 0 0 0 5%; display: inline-block; width: 40%; float: left;}
+.bus_list_head .btn_area {padding: 0 1.5% 0 0; display: inline-block; width: 40%; float: right; text-align: right}
+.bus_list_head .button {background: none; border: none; line-height: 46px; padding: 0 10px 0 10px; display:inline-block; min-width: 62px}
+.bus_list {overflow-y: auto}
+.bus_list li {border-bottom: 1px solid #d9d9d9; padding: 0 5%; line-height: 48px; overflow: hidden;}
+.bus_list li:active {background: #f6f6f6}
+.bus_list li::selection {background: #f6f6f6}
+.bus_list .checklabel, .bus_list p {display: inline-block; vertical-align: top}
+.bus_list .star {margin: 4px 0 0 0}
+.bus_list .delete {display: block; width: 50px; height: 40px; font-size: 0; text-indent: -9999px;  background: url(/resources/images/ic_delete.svg) 65% 50% no-repeat; background-size: 12px; border: none; margin: 4px 0 0 0}
+.bus_list.stationbis .bus {width: 80%}
+.bus_list.stationbis .info {position: absolute; left: 45%}
+.bus_list.stationbis .info span {display: inline-block; width: 50px}
+
+/* bus search,station */
+.searchbox {position: relative; margin: 65px 0 0 0}
+.searchbox .button {position: absolute; right: 4%; top: -60px; z-index: 100; background: url(/resources/images/ic_fv_station.svg) no-repeat 50% 50%; width: 48px; height: 45px; text-indent: -9999px; background-size: 15px; border: none; display: block}
+.input.search {width: 90%; left: 5%; bottom: 16px; border: 1px solid #d9d9d9; background: #FFF url(/resources/images/ic_magnifier.svg) no-repeat 10px; background-size: 16px; text-indent: 30px; border-radius: 2px; position: absolute;}
+.clear_history {width: 100%; text-align: center; line-height: 50px; margin: 20px 0}
+#bsrc .bus, #bsrc .station {width: 68%; margin: 0 0 0 5%}
+.head_info {background: #5ab2e1; height: 66px; overflow: hidden;}
+.head_info .title {float: left; line-height: 66px; color: #FFF; padding-left: 5%; font-size: 30px}
+.head_info .title span {font-size: 16px; padding-left: 10px}
+.head_info .infomenu {float: right; font-size: 0; margin-right: 5%}
+.head_info .infomenu li:last-child {display: inline-block; padding: 13px 0 0 10px}
+.head_info .infomenu li {display: inline-block; padding: 13px 0 0 10px}
+.head_info .infomenu .star {width: 40px; height: 40px; display: inline;}
+.head_info .button {border: 1px solid #FFF; border-radius: 100%; width: 40px; height: 40px; text-indent: -9999px;}
+.head_info .info {background: transparent url(/resources/images/ic_info.svg) no-repeat 50% 50%; background-size: 18px}
+.head_info .map {background: transparent url(/resources/images/ic_map.svg) no-repeat 50% 50%; background-size: 18px}
+
+.head_info .refresh {background: transparent url(/resources/images/ic_refresh.svg) no-repeat 50% 50%; background-size: 21px 18px}
+.head_info .refresh:hover {-webkit-transition: -webkit-transform 2s; transition: transform 2s;-webkit-transform:rotate(360deg); transform:rotate(360deg);}
+
+#bloc .container {width: 100%; height: 85%; overflow-y: scroll;background: url(/resources/images/ic_arrow_down.svg) 30px 19px no-repeat; background-size: 20px;}
+.map_area {background: #f1f1f1; height: 100%}
+
+/* bus location */
+.location_list {margin-bottom: 50px}
+.location_list li {width: 75%; margin: 0 10% 0 15%}
+.location_list li {line-height: 60px; height: 60px; text-align: left; position: relative; overflow: hidden; background: transparent url(/resources/images/ic_point.svg) no-repeat 10px 50%; background-size: 14px 14px;}
+.location_list li::after {content: ""; width: 4px; height: 60px; background: #a5a5a5; display: block;  z-index: -1; top:0; left: 15px}
+.location_list li:first-child::after {top: 25px}
+.location_list li:last-child::after {height: 25px}
+.location_list .bus, .location_list li::after, .location_list .station {position: absolute;}
+.location_list .bus {top: 0; width: 34px; height: 60px; background: url(/resources/images/ic_bus_blue.svg) no-repeat 50% 50%; background-size: 20px; z-index: 1}
+.location_list .station {width: 100%; height: 59px; border-bottom: 1px solid #eee; left: 19px; text-indent: 50px; font-size: 18px}
+
+/* bus route */
+.table {width: 100%; margin: 0 auto}
+.table td {padding: 15px; border-bottom: 1px solid #d9d9d9}
+.table td.bdr {border-right: 1px solid #d9d9d9}
+
+/* tab swiper */
+.swiper-container {width: 100%;	height: 70%; padding-top: 44px !important}
+.swiper-slide {overflow-y: scroll}
+.swiper-pagination {height: 44px; font-size: 0; top: 0}
+.swiper-pagination-bullet {background: #808080 !important; opacity: 1 !important; color: rgba(255, 255, 255, .7)}
+.swiper-pagination-bullet-active {color:#fff; background: #6cc2e4 !important;}
+.swiper-pagination > span {margin: 0 !important; line-height: 44px; height: 100%; font-size: 16px; border-radius: 0}
+.swiper-pagination > span::after {position: absolute; width: 100%; height: 100%; top: 0; left: 0}
+#bsrc .swiper-pagination > span {display: inline-block; width: 50%; position: relative;}
+#bsrc .swiper-pagination > span:nth-child(1)::after {content: "버스"}
+#bsrc .swiper-pagination > span:nth-child(2)::after {content: "정류장"}
+#brout .swiper-pagination > span {display: inline-block; width: 33.33%; position: relative;}
+#brout .swiper-pagination > span:nth-child(1)::after {content: "월 - 금"}
+#brout .swiper-pagination > span:nth-child(2)::after {content: "토요일"}
+#brout .swiper-pagination > span:nth-child(3)::after {content: "휴일"}
+
+/* modal popup */
+.modal {z-index: 101; display:none; padding-top:200px; position:fixed; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4)}
+.modal .modalcontent {margin: 0 auto; background-color:#fff; position:relative; padding:0; outline:0; width:84%; height: auto; border-radius: 3px}
+.modal .container {padding: 10%}
+.modal .btn_area {font-size: 0; margin-top: 36px}
+.modal .button {width: 48%; color: #FFF; display: inline-block; line-height: 40px; border: none; border-radius: 3px}
+.modal .button:first-child {margin-right: 4%}
+#message {display:none; z-index: 100; position: absolute; left: 8%;}
+#popup1.modal {background:none}
+#popup1.modal .button {width: 100%}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.test {}
